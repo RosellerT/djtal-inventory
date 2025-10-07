@@ -1,0 +1,19 @@
+// index.js
+const inventory = [];
+
+function addItem(name, qty, price) {
+  inventory.push({ name, qty, price });
+  console.log(`✅ Added: ${name} (${qty} pcs at ₱${price})`);
+}
+
+function showInventory() {
+  console.log("\n📦 Current Inventory:");
+  inventory.forEach((item, i) => {
+    console.log(`${i + 1}. ${item.name} - ${item.qty} pcs @ ₱${item.price}`);
+  });
+}
+
+// Example usage
+addItem("Router", 5, 1500);
+addItem("Fiber Cable", 20, 25);
+showInventory();

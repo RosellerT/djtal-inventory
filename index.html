@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -69,3 +70,76 @@
   </script>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory App</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f3f3f3; }
+    h1 { color: #2c3e50; }
+    form, table { margin-top: 20px; background: white; padding: 20px; border-radius: 10px; }
+    input { margin: 5px; padding: 8px; }
+    button { padding: 8px 12px; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #2c3e50; color: white; }
+  </style>
+</head>
+<body>
+  <h1>📦 DJTAL Inventory Manager</h1>
+
+  <form id="inventoryForm">
+    <input type="text" id="name" placeholder="Item Name" required>
+    <input type="number" id="qty" placeholder="Quantity" required>
+    <input type="number" id="price" placeholder="Price" required>
+    <button type="submit">Add Item</button>
+  </form>
+
+  <table id="inventoryTable">
+    <thead>
+      <tr><th>#</th><th>Name</th><th>Qty</th><th>Price</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const API_URL = "http://localhost:3000";
+
+    async function loadInventory() {
+      const res = await fetch(API_URL + "/inventory");
+      const items = await res.json();
+      const tbody = document.querySelector("#inventoryTable tbody");
+      tbody.innerHTML = "";
+      items.forEach((item, i) => {
+        const row = `<tr>
+          <td>${i + 1}</td>
+          <td>${item.name}</td>
+          <td>${item.qty}</td>
+          <td>₱${item.price}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+      });
+    }
+
+    document.getElementById("inventoryForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const qty = document.getElementById("qty").value;
+      const price = document.getElementById("price").value;
+      await fetch(API_URL + "/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, qty, price })
+      });
+      e.target.reset();
+      loadInventory();
+    });
+
+    loadInventory();
+  </script>
+</body>
+</html>
+>>>>>>> 2a7cf7e (Initial commit)
