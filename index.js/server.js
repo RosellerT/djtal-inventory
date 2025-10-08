@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -14,8 +14,6 @@ const DATA_FILE = './inventory.json';
 let inventory = [];
 if (fs.existsSync(DATA_FILE)) {
   inventory = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-} else {
-  fs.writeFileSync(DATA_FILE, JSON.stringify([])); // create file if missing
 }
 
 // Save inventory to file
@@ -31,9 +29,7 @@ app.get('/api/items', (req, res) => {
 // Add a new item
 app.post('/api/items', (req, res) => {
   const { name, qty, price } = req.body;
-  if (!name || !qty || !price) {
-    return res.status(400).json({ error: "Missing fields" });
-  }
+  if (!name || !qty || !price) return res.status(400).send('Missing fields');
   const newItem = { name, qty, price };
   inventory.push(newItem);
   saveInventory();
