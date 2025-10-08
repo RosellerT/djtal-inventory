@@ -5,70 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>📦 DJTAL Inventory Manager</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f3f3f3;
-    }
-    h1 {
-      color: #2c3e50;
-    }
-    form, table, #message {
-      margin-top: 20px;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-    }
-    input {
-      margin: 5px;
-      padding: 8px;
-      width: 150px;
-    }
-    button {
-      padding: 8px 12px;
-      cursor: pointer;
-      background-color: #2c3e50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background: #2c3e50;
-      color: white;
-    }
-    #message {
-      display: none;
-      padding: 10px;
-      border-radius: 5px;
-    }
-    .success {
-      background-color: #d4edda;
-      color: #155724;
-    }
-    .error {
-      background-color: #f8d7da;
-      color: #721c24;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f2f2f2; }
+    h1 { color: #333; }
+    input, button { padding: 8px; margin: 5px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #333; color: white; }
   </style>
 </head>
 <body>
   <h1>📦 DJTAL Inventory Manager</h1>
 
-  <div id="message"></div>
-
   <form id="inventoryForm">
     <input type="text" id="name" placeholder="Item Name" required />
-    <input type="number" id="qty" placeholder="Quantity" required min="1" />
-    <input type="number" id="price" placeholder="Price" required min="1" />
+    <input type="number" id="qty" placeholder="Quantity" required />
+    <input type="number" id="price" placeholder="Price" required />
     <button type="submit">Add Item</button>
   </form>
 
@@ -85,21 +36,13 @@
   </table>
 
   <script>
-    const API_URL = "http://localhost:3000";
-    const messageBox = document.getElementById("message");
+    // ✅ Use your deployed Render API URL
+    const API_URL = "https://djtal-inventory.onrender.com/api/items";
 
-    function showMessage(text, type = "success") {
-      messageBox.textContent = text;
-      messageBox.className = type;
-      messageBox.style.display = "block";
-      setTimeout(() => {
-        messageBox.style.display = "none";
-      }, 3000);
-    }
-
+    // Load items from backend
     async function loadInventory() {
       try {
-        const res = await fetch(API_URL + "/api/items");
+        const res = await fetch(API_URL);
         const items = await res.json();
         const tbody = document.querySelector("#inventoryTable tbody");
         tbody.innerHTML = "";
@@ -108,48 +51,39 @@
             <td>${i + 1}</td>
             <td>${item.name}</td>
             <td>${item.qty}</td>
-            <td>₱${Number(item.price).toLocaleString()}</td>
+            <td>₱${item.price}</td>
           </tr>`;
           tbody.innerHTML += row;
         });
       } catch (err) {
-        showMessage("Failed to load inventory. Is the server running?", "error");
+        alert("❌ Failed to load inventory. Server might be down.");
+        console.error(err);
       }
     }
 
+    // Add new item
     document.getElementById("inventoryForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const name = document.getElementById("name").value.trim();
-      const qty = parseInt(document.getElementById("qty").value);
-      const price = parseFloat(document.getElementById("price").value);
-
-      if (!name || qty <= 0 || price <= 0) {
-        showMessage("Please enter valid item details.", "error");
-        return;
-      }
+      const name = document.getElementById("name").value;
+      const qty = document.getElementById("qty").value;
+      const price = document.getElementById("price").value;
 
       try {
-        const res = await fetch(API_URL + "/api/items", {
+        await fetch(API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name, qty, price }),
         });
-
-        if (!res.ok) {
-          const errText = await res.text();
-          throw new Error(errText);
-        }
-
         e.target.reset();
-        showMessage("Item added successfully!");
         loadInventory();
       } catch (err) {
-        showMessage("Error adding item: " + err.message, "error");
+        alert("❌ Failed to add item.");
+        console.error(err);
       }
     });
 
+    // Initial load
     loadInventory();
   </script>
 </body>
 </html>
-
